@@ -1,6 +1,7 @@
 ﻿using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
+using VRC.SDK3.Components;
 
 public class EndPlatform : UdonSharpBehaviour
 {
@@ -11,6 +12,7 @@ public class EndPlatform : UdonSharpBehaviour
     private VRCPlayerApi localPlayer;
     private GameObject activeGun;
     private bool isVR = false;
+    private VRCPickup gunPickup;
 
     void Start()
     {
@@ -20,10 +22,16 @@ public class EndPlatform : UdonSharpBehaviour
         
         if (gunPrefab != null)
         {
+            Debug.Log("[EndPlatform] Attempting to create gun");
             activeGun = VRCInstantiate(gunPrefab);
-            activeGun.transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
+            activeGun.transform.localScale = new Vector3(2f, 2f, 2f);
             activeGun.SetActive(false);
+            gunPickup = activeGun.GetComponent<VRCPickup>();
             Debug.Log("[EndPlatform] Gun created");
+        }
+        else
+        {
+            Debug.LogError("[EndPlatform] Gun prefab is not assigned!");
         }
     }
 
@@ -43,38 +51,35 @@ public class EndPlatform : UdonSharpBehaviour
         {
             hasGun = true;
             activeGun.SetActive(true);
-            Debug.Log("[EndPlatform] Gun activated");
-        }
-    }
-
-    void Update()
-    {
-        if (hasGun && activeGun != null)
-        {
-            UpdateGunPosition();
-        }
-    }
-
-    void UpdateGunPosition()
-    {
-        if (isVR)
-        {
-            // VR hand tracking
-            Vector3 handPosition = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position;
-            Quaternion handRotation = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation;
             
-            activeGun.transform.position = handPosition;
-            activeGun.transform.rotation = handRotation * Quaternion.Euler(0, 90, 0);
+            // Position in front of the player's hand/view
+            Vector3 spawnPosition;
+            if (isVR)
+            {
+                // For VR, position near right hand
+                spawnPosition = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position +
+                              (localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation * new Vector3(0, 0.1f, 0.1f));
+            }
+            else
+            {
+                // For desktop, position in front of head
+                spawnPosition = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position + 
+                              (localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).rotation * new Vector3(0.3f, -0.1f, 0.5f));
+            }
+            
+            activeGun.transform.position = spawnPosition;
+            
+            // Make sure the gun is pickupable
+            if (gunPickup != null)
+            {
+                gunPickup.pickupable = true;
+            }
+            
+            Debug.Log("[EndPlatform] Gun activated and positioned for pickup");
         }
         else
         {
-            // Desktop mode - follow camera
-            Vector3 playerPosition = localPlayer.GetPosition();
-            Quaternion playerRotation = localPlayer.GetRotation();
-            
-            Vector3 offset = playerRotation * new Vector3(0.3f, 1.2f, 0.5f);
-            activeGun.transform.position = playerPosition + offset;
-            activeGun.transform.rotation = playerRotation * Quaternion.Euler(0, 90, 0);
+            Debug.LogError("[EndPlatform] Active gun is null when trying to give to player!");
         }
     }
 }
