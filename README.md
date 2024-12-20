@@ -1,0 +1,2 @@
+# MetaverseSquidGame
+ Proyecto de Metaverso
