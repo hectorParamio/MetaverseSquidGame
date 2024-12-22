@@ -6,6 +6,10 @@ using VRC.SDK3.Components;
 public class EndPlatform : UdonSharpBehaviour
 {
     public GameObject gunPrefab;
+    public GameObject bulletPrefab;
+    public Transform bulletSpawnPoint;
+    public float bulletSpeed = 30f;
+    public float bulletLifetime = 3f;
     public ParticleSystem muzzleFlash;
     public AudioSource shootSound;
     private bool hasGun = false;
@@ -140,35 +144,58 @@ public class EndPlatform : UdonSharpBehaviour
     private void TryShoot()
     {
         if (Time.time - lastShootTime < shootCooldown) return;
+        
+        // Play sound effect
+        if (shootSound != null)
+        {
+            shootSound.PlayOneShot(shootSound.clip);
+        }
 
+        // Play muzzle flash
         if (muzzleFlash != null)
         {
             muzzleFlash.Play();
         }
 
-        if (shootSound != null)
+        // Spawn bullet
+        if (bulletPrefab != null && bulletSpawnPoint != null)
         {
-            shootSound.Play();
-        }
+            GameObject bullet = VRCInstantiate(bulletPrefab);
+            
+            // If no spawn point set, use gun's position
+            Vector3 spawnPos = bulletSpawnPoint != null ? 
+                bulletSpawnPoint.position : 
+                activeGun.transform.position + activeGun.transform.forward * 0.5f;
+            
+            bullet.transform.position = spawnPos;
+            
+            // Set bullet direction based on VR/Desktop
+            Vector3 shootDirection;
+            if (isVR && gunPickup.IsHeld)
+            {
+                shootDirection = activeGun.transform.forward;
+                bullet.transform.rotation = activeGun.transform.rotation;
+            }
+            else if (isHoldingGun)
+            {
+                shootDirection = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).rotation * Vector3.forward;
+                bullet.transform.rotation = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).rotation;
+            }
+            else
+            {
+                return; // Don't shoot if not holding gun
+            }
 
-        // Get the forward direction based on VR/Desktop
-        Vector3 shootDirection;
-        if (isVR && isHeld)
-        {
-            shootDirection = activeGun.transform.forward;
-        }
-        else
-        {
-            // For desktop, shoot where the player is looking
-            shootDirection = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).rotation * Vector3.forward;
-        }
+            // Add force to bullet
+            Rigidbody bulletRb = bullet.GetComponent<Rigidbody>();
+            if (bulletRb != null)
+            {
+                bulletRb.velocity = shootDirection * bulletSpeed;
+            }
 
-        // You can add raycast logic here for hit detection
-        // RaycastHit hit;
-        // if (Physics.Raycast(activeGun.transform.position, shootDirection, out hit, 100f))
-        // {
-        //     // Handle hit logic
-        // }
+            // Destroy bullet after lifetime
+            Destroy(bullet, bulletLifetime);
+        }
 
         lastShootTime = Time.time;
     }
