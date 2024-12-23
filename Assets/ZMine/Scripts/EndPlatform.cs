@@ -8,8 +8,8 @@ public class EndPlatform : UdonSharpBehaviour
     public GameObject gunPrefab;
     public GameObject bulletPrefab;
     public Transform bulletSpawnPoint;
-    public float bulletSpeed = 30f;
-    public float bulletLifetime = 3f;
+    public float bulletSpeed = 60f;
+    public float bulletLifetime = 2f;
     public ParticleSystem muzzleFlash;
     public AudioSource shootSound;
     private bool hasGun = false;
@@ -26,27 +26,38 @@ public class EndPlatform : UdonSharpBehaviour
     private Vector3 gunOffset = new Vector3(0.5f, -0.3f, 0.7f); // Adjust these values to position the gun
 
     void Start()
+{
+    Debug.Log("[EndPlatform] Script started");
+    localPlayer = Networking.LocalPlayer;
+    isVR = localPlayer.IsUserInVR();
+    Debug.Log($"[EndPlatform] Is VR: {isVR}");
+
+    if (gunPrefab != null)
     {
-        Debug.Log("[EndPlatform] Script started");
-        localPlayer = Networking.LocalPlayer;
-        isVR = localPlayer.IsUserInVR();
-        Debug.Log($"[EndPlatform] Is VR: {isVR}");
-        
-        if (gunPrefab != null)
+        Debug.Log("[EndPlatform] Attempting to create gun");
+        activeGun = VRCInstantiate(gunPrefab);
+        Debug.Log($"[EndPlatform] Gun instantiated: {activeGun != null}");
+        activeGun.transform.localScale = new Vector3(2f, 2f, 2f);
+        activeGun.SetActive(false);
+
+        // Assign bulletSpawnPoint dynamically from the instantiated gun
+        bulletSpawnPoint = activeGun.transform.Find("Bullet Spawn Point");
+        if (bulletSpawnPoint == null)
         {
-            Debug.Log("[EndPlatform] Attempting to create gun");
-            activeGun = VRCInstantiate(gunPrefab);
-            Debug.Log($"[EndPlatform] Gun instantiated: {activeGun != null}");
-            activeGun.transform.localScale = new Vector3(2f, 2f, 2f);
-            activeGun.SetActive(false);
-            gunPickup = activeGun.GetComponent<VRCPickup>();
-            Debug.Log($"[EndPlatform] Gun pickup component found: {gunPickup != null}");
+            Debug.LogError("[EndPlatform] Bullet Spawn Point not found in gun prefab! Falling back to gun transform.");
+            bulletSpawnPoint = activeGun.transform; // Fallback to gun's transform
         }
-        else
-        {
-            Debug.LogError("[EndPlatform] Gun prefab is not assigned!");
-        }
+
+        gunPickup = activeGun.GetComponent<VRCPickup>();
+        Debug.Log($"[EndPlatform] Gun pickup component found: {gunPickup != null}");
     }
+    else
+    {
+        Debug.LogError("[EndPlatform] Gun prefab is not assigned!");
+    }
+}
+
+
 
     public override void OnPlayerTriggerEnter(VRCPlayerApi player)
     {
@@ -141,62 +152,86 @@ public class EndPlatform : UdonSharpBehaviour
         }
     }
 
-    private void TryShoot()
+private void TryShoot()
+{
+    if (Time.time - lastShootTime < shootCooldown) return;
+
+    // Play sound effect
+    if (shootSound != null)
     {
-        if (Time.time - lastShootTime < shootCooldown) return;
-        
-        // Play sound effect
-        if (shootSound != null)
-        {
-            shootSound.PlayOneShot(shootSound.clip);
-        }
-
-        // Play muzzle flash
-        if (muzzleFlash != null)
-        {
-            muzzleFlash.Play();
-        }
-
-        // Spawn bullet
-        if (bulletPrefab != null && bulletSpawnPoint != null)
-        {
-            GameObject bullet = VRCInstantiate(bulletPrefab);
-            
-            // If no spawn point set, use gun's position
-            Vector3 spawnPos = bulletSpawnPoint != null ? 
-                bulletSpawnPoint.position : 
-                activeGun.transform.position + activeGun.transform.forward * 0.5f;
-            
-            bullet.transform.position = spawnPos;
-            
-            // Set bullet direction based on VR/Desktop
-            Vector3 shootDirection;
-            if (isVR && gunPickup.IsHeld)
-            {
-                shootDirection = activeGun.transform.forward;
-                bullet.transform.rotation = activeGun.transform.rotation;
-            }
-            else if (isHoldingGun)
-            {
-                shootDirection = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).rotation * Vector3.forward;
-                bullet.transform.rotation = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).rotation;
-            }
-            else
-            {
-                return; // Don't shoot if not holding gun
-            }
-
-            // Add force to bullet
-            Rigidbody bulletRb = bullet.GetComponent<Rigidbody>();
-            if (bulletRb != null)
-            {
-                bulletRb.velocity = shootDirection * bulletSpeed;
-            }
-
-            // Destroy bullet after lifetime
-            Destroy(bullet, bulletLifetime);
-        }
-
-        lastShootTime = Time.time;
+        shootSound.PlayOneShot(shootSound.clip);
     }
+
+    // Play muzzle flash
+    if (muzzleFlash != null)
+    {
+        muzzleFlash.Play();
+    }
+
+    // Spawn bullet
+    if (bulletPrefab != null)
+    {
+        GameObject bullet = VRCInstantiate(bulletPrefab);
+
+        // Define a local offset for the bullet's spawn position
+        Vector3 localSpawnOffset = new Vector3(0.18f, 0.0f, 0.55f); // Adjust these values as needed
+        
+        // Use the dynamically assigned spawn point or fallback to gun position
+        Vector3 spawnPos = bulletSpawnPoint != null 
+            ? bulletSpawnPoint.TransformPoint(localSpawnOffset) 
+            : activeGun.transform.TransformPoint(localSpawnOffset); // Fallback to gun's transform
+
+        bullet.transform.position = spawnPos;
+
+        // Determine shoot direction toward the center of the screen
+        Vector3 shootDirection;
+        if (isVR && gunPickup.IsHeld)
+        {
+            // Use right-hand tracking for VR mode
+            Vector3 rightHandPosition = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position;
+            Quaternion rightHandRotation = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation;
+            
+            // Raycast from the hand forward to find the aim target
+            shootDirection = (rightHandRotation * Vector3.forward);
+        }
+        else
+        {
+            // Use camera forward for Desktop mode
+            Vector3 cameraPosition = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position;
+            Quaternion cameraRotation = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).rotation;
+
+            // Raycast from the camera forward to find the aim target
+            shootDirection = cameraRotation * Vector3.forward;
+        }
+
+        // Ensure bullet aims in the determined shoot direction
+        bullet.transform.rotation = Quaternion.LookRotation(shootDirection);
+
+        // Apply 90-degree rotation adjustment
+        bullet.transform.Rotate(90, 0, 0);
+
+        // Add force to bullet
+        Rigidbody bulletRb = bullet.GetComponent<Rigidbody>();
+        if (bulletRb != null)
+        {
+            bulletRb.velocity = shootDirection * bulletSpeed; // Use velocity for constant speed
+            Debug.Log($"[EndPlatform] Bullet velocity applied: {bulletRb.velocity}");
+        }
+        else
+        {
+            Debug.LogError("[EndPlatform] Bullet prefab is missing a Rigidbody component!");
+        }
+
+        // Destroy bullet after lifetime
+        Destroy(bullet, bulletLifetime);
+    }
+
+    lastShootTime = Time.time;
+}
+
+
+
+
+
+
 }
