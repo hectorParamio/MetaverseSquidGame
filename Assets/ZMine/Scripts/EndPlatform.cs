@@ -47,6 +47,7 @@ public class EndPlatform : UdonSharpBehaviour
             bulletSpawnPoint = activeGun.transform.Find("Bullet Spawn Point");
             if (bulletSpawnPoint == null)
             {
+                Debug.LogError("[EndPlatform] Gun prefab is not assigned!");
                 Debug.LogError("[EndPlatform] Bullet Spawn Point not found in gun prefab! Falling back to gun transform.");
                 bulletSpawnPoint = activeGun.transform;
             }
