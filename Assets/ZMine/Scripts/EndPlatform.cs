@@ -123,7 +123,7 @@ public class EndPlatform : UdonSharpBehaviour
 
     public override void OnPickupUseDown()
     {
-        TryShoot();
+        // TryShoot();
     }
 
     public void Update()
