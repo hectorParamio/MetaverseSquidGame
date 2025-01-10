@@ -1,8 +1,12 @@
 ﻿using UdonSharp;
 using UnityEngine;
+using VRC.SDKBase;
 
 public class PlatformToggle : UdonSharpBehaviour
 {
+    private GameObject disabledPlatform;
+    private MeshRenderer disabledPlatformRenderer;
+
     private void Start()
     {
         Transform leftPlatform = transform.Find("JumpPlatformL");
@@ -20,13 +24,19 @@ public class PlatformToggle : UdonSharpBehaviour
                 {
                     leftCollider.enabled = true;
                     rightCollider.enabled = false;
+                    disabledPlatform = rightPlatform.gameObject;
                 }
                 else
                 {
                     leftCollider.enabled = false;
                     rightCollider.enabled = true;
+                    disabledPlatform = leftPlatform.gameObject;
                 }
+
+                // Get the MeshRenderer of the disabled platform
+                disabledPlatformRenderer = disabledPlatform.GetComponent<MeshRenderer>();
             }
         }
     }
+
 }

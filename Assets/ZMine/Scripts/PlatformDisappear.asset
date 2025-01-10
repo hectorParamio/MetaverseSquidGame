@@ -10,18 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c333ccfdd0cbdbc4ca30cef2dd6e6b9b, type: 3}
-  m_Name: PlatformToggle
+  m_Name: PlatformDisappear
   m_EditorClassIdentifier: 
-  serializedUdonProgramAsset: {fileID: 11400000, guid: 4c18f095df180d44ebaa641545df74ce,
+  serializedUdonProgramAsset: {fileID: 11400000, guid: 1f8dc07b0ef216a4986457ac0b4a2ebf,
     type: 2}
   udonAssembly: 
   assemblyError: 
-  sourceCsScript: {fileID: 11500000, guid: 83b47f36fcc3ef94aa4882ffde8b705c, type: 3}
+  sourceCsScript: {fileID: 11500000, guid: ba02b708d7e749f45b0e38753cba6712, type: 3}
   scriptVersion: 2
   compiledVersion: 2
   behaviourSyncMode: 0
   hasInteractEvent: 0
-  scriptID: -3549053403399675987
+  scriptID: 4918167613580475897
   serializationData:
     SerializedFormat: 2
     SerializedBytes: 
@@ -50,19 +50,19 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: disabledPlatform
+      Data: platformRenderer
     - Name: $v
       Entry: 7
       Data: 2|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: <Name>k__BackingField
       Entry: 1
-      Data: disabledPlatform
+      Data: platformRenderer
     - Name: <UserType>k__BackingField
       Entry: 7
       Data: 3|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
-      Data: UnityEngine.GameObject, UnityEngine.CoreModule
+      Data: UnityEngine.MeshRenderer, UnityEngine.CoreModule
     - Name: 
       Entry: 8
       Data: 
@@ -104,19 +104,19 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: disabledPlatformRenderer
+      Data: childPrefab
     - Name: $v
       Entry: 7
       Data: 5|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: <Name>k__BackingField
       Entry: 1
-      Data: disabledPlatformRenderer
+      Data: childPrefab
     - Name: <UserType>k__BackingField
       Entry: 7
       Data: 6|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
-      Data: UnityEngine.MeshRenderer, UnityEngine.CoreModule
+      Data: UnityEngine.GameObject, UnityEngine.CoreModule
     - Name: 
       Entry: 8
       Data: 
