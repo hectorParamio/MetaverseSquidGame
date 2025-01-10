@@ -2189,7 +2189,7 @@ MonoBehaviour:
   shootSound: {fileID: 0}
   shootForce: 20
   shootCooldown: 0.2
-  respawnPoint: {fileID: 0}
+  respawnPoint: {fileID: 2114370584}
 --- !u!4 &801949022 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4472740163622630157, guid: af5b2da1066423547ab097090fe91b15,
@@ -6673,7 +6673,7 @@ MonoBehaviour:
   shootSound: {fileID: 0}
   shootForce: 20
   shootCooldown: 0.2
-  respawnPoint: {fileID: 2114370584}
+  respawnPoint: {fileID: 0}
 --- !u!1 &2114370583
 GameObject:
   m_ObjectHideFlags: 0

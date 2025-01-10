@@ -24,7 +24,7 @@ public class EndPlatform : UdonSharpBehaviour
     private bool isHeld = false;
     private bool isHoldingGun = false;
     private Vector3 gunOffset = new Vector3(0.5f, -0.3f, 0.7f);
-
+    public Transform respawnPoint;
     // NEW: Variables for shot mechanics
     private int shotsFired = 0; // Track shots fired
     private const int maxShots = 3; // Maximum shots allowed
@@ -35,7 +35,6 @@ public class EndPlatform : UdonSharpBehaviour
         localPlayer = Networking.LocalPlayer;
         isVR = localPlayer.IsUserInVR();
         Debug.Log($"[EndPlatform] Is VR: {isVR}");
-
         if (gunPrefab != null)
         {
             Debug.Log("[EndPlatform] Attempting to create gun");
@@ -199,6 +198,7 @@ private void TryShoot()
                 // Aim towards the player's face
                 Vector3 playerHeadPosition = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position;
                 shootDirection = (playerHeadPosition - spawnPos).normalized;
+                localPlayer.TeleportTo(respawnPoint.position, respawnPoint.rotation);
 
                 Debug.Log("[EndPlatform] Shot backfired! Bullet aimed at the player.");
             }
