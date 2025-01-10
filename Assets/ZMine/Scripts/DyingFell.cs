@@ -2,7 +2,7 @@
 using UnityEngine;
 using VRC.SDKBase;
 
-public class Dying : UdonSharpBehaviour
+public class DyingFell : UdonSharpBehaviour
 {
     public Transform respawnPoint; // Assign this in the inspector to your RespawnPoint
 
