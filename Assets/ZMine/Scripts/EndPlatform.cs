@@ -198,7 +198,7 @@ private void TryShoot()
                 // Aim towards the player's face
                 Vector3 playerHeadPosition = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position;
                 shootDirection = (playerHeadPosition - spawnPos).normalized;
-                localPlayer.TeleportTo(respawnPoint.position, respawnPoint.rotation);
+                // localPlayer.TeleportTo(respawnPoint.position, respawnPoint.rotation);
 
                 Debug.Log("[EndPlatform] Shot backfired! Bullet aimed at the player.");
             }
