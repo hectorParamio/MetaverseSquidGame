@@ -7,6 +7,7 @@ using TMPro;
 public class Personas : UdonSharpBehaviour
 {
     public GameObject[] personaObjects; // Array of Persona objects
+    public Transform spawnPoint; // Reference to the spawn point
 
     private void Update()
     {
@@ -14,13 +15,6 @@ public class Personas : UdonSharpBehaviour
         VRCPlayerApi[] players = new VRCPlayerApi[playerCount];
         VRCPlayerApi.GetPlayers(players);
 
-        // Log the list of player names
-        string playerNames = "Player Names: ";
-        for (int i = 0; i < playerCount; i++)
-        {
-            playerNames += players[i].displayName + ", ";
-        }
-        Debug.Log(playerNames);
 
         // Update text fields with player names
         for (int i = 0; i < personaObjects.Length; i++)
@@ -37,6 +31,22 @@ public class Personas : UdonSharpBehaviour
                 {
                     textField.text = "";
                 }
+            }
+        }
+    }
+
+    public void TeleportPlayerToSpawnPoint(string playerName)
+    {
+        int playerCount = VRCPlayerApi.GetPlayerCount();
+        VRCPlayerApi[] players = new VRCPlayerApi[playerCount];
+        VRCPlayerApi.GetPlayers(players);
+
+        foreach (VRCPlayerApi player in players)
+        {
+            if (player.displayName == playerName)
+            {
+                player.TeleportTo(spawnPoint.position, spawnPoint.rotation);
+                break;
             }
         }
     }

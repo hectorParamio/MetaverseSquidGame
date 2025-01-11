@@ -29,6 +29,9 @@ public class EndPlatform : UdonSharpBehaviour
     private int shotsFired = 0; // Track shots fired
     private const int maxShots = 3; // Maximum shots allowed
     private readonly float[] failureProbabilities = { 10f, 40f, 60f }; // Failure chances for each shot (reverse order)
+    [UdonSynced] private bool isGunActive = false;
+    private VRCObjectSync gunObjectSync;
+
    void Start()
     {
         Debug.Log("[EndPlatform] Script started");
@@ -39,6 +42,11 @@ public class EndPlatform : UdonSharpBehaviour
         {
             Debug.Log("[EndPlatform] Attempting to create gun");
             activeGun = VRCInstantiate(gunPrefab);
+            gunObjectSync = activeGun.GetComponent<VRCObjectSync>();
+            if (gunObjectSync == null)
+            {
+                Debug.LogError("[EndPlatform] VRCObjectSync component missing on gun prefab!");
+            }
             Debug.Log($"[EndPlatform] Gun instantiated: {activeGun != null}");
             activeGun.transform.localScale = new Vector3(2f, 2f, 2f);
             activeGun.SetActive(false);
@@ -78,7 +86,10 @@ public class EndPlatform : UdonSharpBehaviour
     {
         if (activeGun != null)
         {
+            Networking.SetOwner(localPlayer, activeGun);
             hasGun = true;
+            isGunActive = true;
+            RequestSerialization(); // Sync the gun state
             activeGun.SetActive(true);
             
             if (isVR)
@@ -198,7 +209,7 @@ private void TryShoot()
                 // Aim towards the player's face
                 Vector3 playerHeadPosition = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position;
                 shootDirection = (playerHeadPosition - spawnPos).normalized;
-                // localPlayer.TeleportTo(respawnPoint.position, respawnPoint.rotation);
+                localPlayer.TeleportTo(respawnPoint.position, respawnPoint.rotation);
 
                 Debug.Log("[EndPlatform] Shot backfired! Bullet aimed at the player.");
             }
@@ -246,6 +257,14 @@ private void TryShoot()
         {
             Debug.LogError("[EndPlatform] Player is hit by their own bullet!");
             // Add self-death logic here (if needed)
+        }
+    }
+
+    public override void OnDeserialization()
+    {
+        if (activeGun != null)
+        {
+            activeGun.SetActive(isGunActive);
         }
     }
 
