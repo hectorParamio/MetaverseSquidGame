@@ -9,6 +9,9 @@ public class PlatformDisappear : UdonSharpBehaviour
     [Header("Audio")]
     public AudioSource disappearSound;
     public AudioClip disappearClip;
+    public AudioSource shootSound;
+    public AudioSource shootSound2;
+    public AudioSource shootSound3;
 
     void Start()
     {
@@ -62,17 +65,26 @@ public class PlatformDisappear : UdonSharpBehaviour
             if (platformRenderer.GetComponent<Collider>().enabled == false)
             {
                 platformRenderer.enabled = false;
-                
+                // Play random sound effect
+                if (shootSound != null && shootSound2 != null && shootSound3 != null)
+                {
+                    int randomSound = Random.Range(0, 3); // Returns 0 or 1
+                    if (randomSound == 0)
+                    {
+                        shootSound.PlayOneShot(shootSound.clip);
+                    }
+                    else if(randomSound == 1){
+                        shootSound2.PlayOneShot(shootSound2.clip);
+                    }
+                    else
+                    {
+                        shootSound3.PlayOneShot(shootSound3.clip);
+                    }
+                }
+
                 if (childPrefab != null)
                 {
                     childPrefab.SetActive(false);
-                }
-
-                // Play disappear sound
-                if (disappearSound != null && disappearClip != null)
-                {
-                    Debug.Log("[PlatformDisappear] Playing disappear sound");
-                    disappearSound.PlayOneShot(disappearClip);
                 }
             }
         }

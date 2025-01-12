@@ -17,10 +17,14 @@ public class DoorController : UdonSharpBehaviour
     private bool hasBeenOpened = false;
     private bool isOpening = false;
     private float closeTimer = 0f;
+    private bool secondSoundPlayed = false;  // Add this with other private variables
+    private float soundTimer = 0f;           // Add this with other private variables
 
     private Vector3 initialLeftPosition;
     private Vector3 initialRightPosition;
-
+    [Header("Audio")]
+    public AudioSource sound;
+    
     void Start()
     {
         if (doorLeft == null || doorRight == null)
@@ -72,13 +76,33 @@ public class DoorController : UdonSharpBehaviour
 
         if (!hasBeenOpened && playerInTrigger && Input.GetKeyDown(KeyCode.E))
         {
+            if (sound != null)
+            {
+                sound.PlayOneShot(sound.clip);
+                soundTimer = sound.clip.length;  // Start the timer for second sound
+            }
+
             Debug.Log("[DoorController] Opening door");
             isOpening = true;
             hasBeenOpened = true;
             closeTimer = closeDelay;
             if (pressEText != null)
             {
-                pressEText.enabled = false;  // Hide text when door is activated
+                pressEText.enabled = false;
+            }
+        }
+
+        // Handle second sound
+        if (soundTimer > 0 && !secondSoundPlayed)
+        {
+            soundTimer -= Time.deltaTime;
+            if (soundTimer <= 0)
+            {
+                if (sound != null)
+                {
+                    sound.PlayOneShot(sound.clip);
+                    secondSoundPlayed = true;
+                }
             }
         }
 

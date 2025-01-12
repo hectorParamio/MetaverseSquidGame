@@ -33,6 +33,10 @@ public class EndPlatform : UdonSharpBehaviour
     private readonly float[] failureProbabilities = { 10f, 40f, 60f }; // Failure chances for each shot (reverse order)
     [UdonSynced] private bool isGunActive = false;
     private VRCObjectSync gunObjectSync;
+    [Header("Timer Settings")]
+    public CountdownTimer countdownTimer;
+    public AudioSource triggerSound;
+    public AudioClip triggerSoundClip;
 
    void Start()
     {
@@ -85,6 +89,23 @@ public class EndPlatform : UdonSharpBehaviour
     public override void OnPlayerTriggerEnter(VRCPlayerApi player)
     {
         Debug.Log($"[EndPlatform] Trigger entered by player: {player.displayName}");
+        
+        // Play trigger sound
+        if (triggerSound != null && triggerSoundClip != null)
+        {
+            triggerSound.PlayOneShot(triggerSoundClip);
+        }
+
+        // Set countdown timer to 13 if it's higher
+        if (countdownTimer != null)
+        {
+            float currentTime = countdownTimer.timeRemaining;
+            if (currentTime > 12f)
+            {
+                countdownTimer.SetTime(12f);
+            }
+        }
+
         Debug.Log($"[EndPlatform] Is local player: {player == localPlayer}, Has gun: {hasGun}");
         if (player == localPlayer && !hasGun)
         {
