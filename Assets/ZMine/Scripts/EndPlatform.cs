@@ -11,7 +11,9 @@ public class EndPlatform : UdonSharpBehaviour
     public float bulletSpeed = 60f;
     public float bulletLifetime = 2f;
     public ParticleSystem muzzleFlash;
+    [Header("Audio")]
     public AudioSource shootSound;
+    public AudioClip shootClip;
     private bool hasGun = false;
     private VRCPlayerApi localPlayer;
     private GameObject activeGun;
@@ -65,6 +67,15 @@ public class EndPlatform : UdonSharpBehaviour
         else
         {
             Debug.LogError("[EndPlatform] Gun prefab is not assigned!");
+        }
+
+        if (shootSound != null)
+        {
+            shootSound.playOnAwake = false;
+            if (shootClip != null)
+            {
+                shootSound.clip = shootClip;
+            }
         }
     }
 
@@ -178,9 +189,14 @@ private void TryShoot()
         }
 
         // Play sound effect
-        if (shootSound != null)
+        if (shootSound != null && shootClip != null)
         {
-            shootSound.PlayOneShot(shootSound.clip);
+            Debug.Log("[EndPlatform] Playing shoot sound");
+            shootSound.PlayOneShot(shootClip);
+        }
+        else
+        {
+            Debug.LogWarning("[EndPlatform] No shoot sound or audio clip assigned!");
         }
 
         // Play muzzle flash
