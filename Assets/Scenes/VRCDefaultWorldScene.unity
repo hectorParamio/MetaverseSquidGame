@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.31095192, g: 0.33218214, b: 0.39446414, a: 1}
+  m_IndirectSpecularColor: {r: 0.31095207, g: 0.3321825, b: 0.39446488, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -3952,6 +3952,8 @@ MonoBehaviour:
   muzzleFlash: {fileID: 0}
   shootSound: {fileID: 791573071}
   shootClip: {fileID: 8300000, guid: 55058f900a92bcb4d9e64c1af8ccc9df, type: 3}
+  nobulletSound: {fileID: 0}
+  nobulletClip: {fileID: 0}
   shootForce: 20
   shootCooldown: 0.2
   respawnPoint: {fileID: 0}
@@ -5817,6 +5819,8 @@ MonoBehaviour:
   muzzleFlash: {fileID: 0}
   shootSound: {fileID: 0}
   shootClip: {fileID: 0}
+  nobulletSound: {fileID: 0}
+  nobulletClip: {fileID: 0}
   shootForce: 20
   shootCooldown: 0.2
   respawnPoint: {fileID: 0}
@@ -6485,7 +6489,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1040028142
 Transform:
   m_ObjectHideFlags: 0
@@ -12282,6 +12286,8 @@ MonoBehaviour:
   muzzleFlash: {fileID: 0}
   shootSound: {fileID: 0}
   shootClip: {fileID: 0}
+  nobulletSound: {fileID: 0}
+  nobulletClip: {fileID: 0}
   shootForce: 20
   shootCooldown: 0.2
   respawnPoint: {fileID: 2114370584}
@@ -14706,6 +14712,7 @@ GameObject:
   - component: {fileID: 2095258597}
   - component: {fileID: 2095258599}
   - component: {fileID: 2095258600}
+  - component: {fileID: 2095258601}
   m_Layer: 0
   m_Name: Trigger Zone
   m_TagString: Untagged
@@ -14807,6 +14814,8 @@ MonoBehaviour:
   muzzleFlash: {fileID: 0}
   shootSound: {fileID: 2095258599}
   shootClip: {fileID: 8300000, guid: 55058f900a92bcb4d9e64c1af8ccc9df, type: 3}
+  nobulletSound: {fileID: 2095258601}
+  nobulletClip: {fileID: 8300000, guid: e82edfc09be256b4b9b2cde2dd1afaa6, type: 3}
   shootForce: 20
   shootCooldown: 0.2
   respawnPoint: {fileID: 2114370584}
@@ -14921,7 +14930,103 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 13fac07caa56e6443b2ff5276729be67, type: 3}
   m_PlayOnAwake: 0
-  m_Volume: 0.5
+  m_Volume: 0.2
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!82 &2095258601
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2095258594}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 8300000, guid: e82edfc09be256b4b9b2cde2dd1afaa6, type: 3}
+  m_PlayOnAwake: 0
+  m_Volume: 0.548
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -15879,10 +15984,6 @@ MonoBehaviour:
     ID: 17
     SerializedTypeNames:
     - VRC.Udon.UdonBehaviour
-  - gameObject: {fileID: 1772630330}
-    ID: 19
-    SerializedTypeNames:
-    - VRC.Udon.UdonBehaviour
   - gameObject: {fileID: 2119444681}
     ID: 21
     SerializedTypeNames:
@@ -16002,6 +16103,10 @@ MonoBehaviour:
     - VRC.SDK3.Components.VRCObjectSync
   - gameObject: {fileID: 912527277}
     ID: 88
+    SerializedTypeNames:
+    - VRC.Udon.UdonBehaviour
+  - gameObject: {fileID: 1772630330}
+    ID: 19
     SerializedTypeNames:
     - VRC.Udon.UdonBehaviour
   portraitCameraPositionOffset: {x: 0, y: 0, z: 0}

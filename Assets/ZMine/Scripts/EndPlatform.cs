@@ -14,6 +14,8 @@ public class EndPlatform : UdonSharpBehaviour
     [Header("Audio")]
     public AudioSource shootSound;
     public AudioClip shootClip;
+    public AudioSource nobulletSound;
+    public AudioClip nobulletClip;
     private bool hasGun = false;
     private VRCPlayerApi localPlayer;
     private GameObject activeGun;
@@ -213,6 +215,7 @@ private void TryShoot()
         if (shotsFired >= maxShots)
         {
             Debug.LogWarning("[EndPlatform] This gun is out of bullets!");
+            nobulletSound.PlayOneShot(nobulletClip);
             return;
         }
 
