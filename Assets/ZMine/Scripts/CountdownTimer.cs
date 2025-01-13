@@ -11,6 +11,7 @@ public class CountdownTimer : UdonSharpBehaviour
     public float startTime = 180f; // 3 minutes
     [UdonSynced] private bool isTimerRunning = false;
     [UdonSynced] private float networkTime = 0f;
+    [UdonSynced] private bool shouldChangeLightColor = false;
     public float timeRemaining { get; private set; }
 
     [Header("Light Settings")]
@@ -22,7 +23,6 @@ public class CountdownTimer : UdonSharpBehaviour
     {
         if (timerDisplay == null)
         {
-            Debug.LogError("[CountdownTimer] Timer display TextMeshPro reference is missing!");
             return;
         }
         timeRemaining = startTime;
@@ -30,7 +30,6 @@ public class CountdownTimer : UdonSharpBehaviour
         
         if (areaLight == null)
         {
-            Debug.LogError("[CountdownTimer] Area Light reference is missing!");
         }
     }
 
@@ -56,12 +55,11 @@ public class CountdownTimer : UdonSharpBehaviour
                 {
                     networkTime = 0;
                     isTimerRunning = false;
-                    ChangeAreaLightColor();
+                    shouldChangeLightColor = true;
                     RequestSerialization();
                 }
                 else
                 {
-                    // Request serialization every frame while timer is running
                     RequestSerialization();
                 }
             }
@@ -69,6 +67,12 @@ public class CountdownTimer : UdonSharpBehaviour
             // Update local display for all clients
             timeRemaining = networkTime;
             UpdateTimerDisplay();
+        }
+
+        // Check for light color change
+        if (shouldChangeLightColor)
+        {
+            ChangeAreaLightColor();
         }
     }
 
@@ -90,7 +94,6 @@ public class CountdownTimer : UdonSharpBehaviour
             timerDisplay.text = $"{minutes:00}:{seconds:00}";
 
             // Debug log to check if the display is updating
-            Debug.Log($"[CountdownTimer] Updating display: {timerDisplay.text}");
         }
         else
         {
@@ -102,6 +105,12 @@ public class CountdownTimer : UdonSharpBehaviour
     {
         timeRemaining = networkTime;
         UpdateTimerDisplay();
+        
+        // Check if we should change the light color after deserialization
+        if (shouldChangeLightColor)
+        {
+            ChangeAreaLightColor();
+        }
     }
 
     private void ChangeAreaLightColor()

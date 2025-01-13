@@ -10,6 +10,8 @@ public class TeleportManager : UdonSharpBehaviour
 
     void Start()
     {
+        Debug.Log($"[TeleportManager] Component attached to GameObject: {gameObject.name}");
+        
         if (respawnPoint == null)
         {
             GameObject respawnObj = GameObject.Find("RespawnPoint");

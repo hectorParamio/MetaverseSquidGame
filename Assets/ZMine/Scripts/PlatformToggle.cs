@@ -9,7 +9,6 @@ public class PlatformToggle : UdonSharpBehaviour
 
     void Start()
     {
-        Debug.Log("[PlatformToggle] Starting initialization");
         
         // First ensure both platforms are visible
         Transform leftPlatform = transform.Find("JumpPlatformL");
@@ -28,20 +27,17 @@ public class PlatformToggle : UdonSharpBehaviour
             if (leftCollider != null) leftCollider.enabled = true;
             if (rightCollider != null) rightCollider.enabled = true;
 
-            Debug.Log("[PlatformToggle] Both platforms enabled initially");
         }
 
         // Then proceed with network initialization if owner
         if (Networking.IsOwner(gameObject))
         {
-            Debug.Log("[PlatformToggle] Is owner, initializing platforms");
             InitializePlatforms();
         }
     }
 
     public override void OnPlayerJoined(VRCPlayerApi player)
     {
-        Debug.Log("[PlatformToggle] Player joined, initialized: " + initialized);
         if (!initialized)
         {
             SyncPlatformState();
@@ -52,10 +48,8 @@ public class PlatformToggle : UdonSharpBehaviour
     {
         if (!initialized)
         {
-            Debug.Log("[PlatformToggle] Performing initial platform setup");
             int randomChoice = Random.Range(0, 2);
             isLeftEnabled = (randomChoice == 0);
-            Debug.Log("[PlatformToggle] Random choice made: Left platform enabled = " + isLeftEnabled);
             
             RequestSerialization();
             SyncPlatformState();
@@ -66,13 +60,11 @@ public class PlatformToggle : UdonSharpBehaviour
 
     public override void OnDeserialization()
     {
-        Debug.Log("[PlatformToggle] Deserializing state: Left platform enabled = " + isLeftEnabled);
         SyncPlatformState();
     }
 
     private void SyncPlatformState()
     {
-        Debug.Log("[PlatformToggle] Syncing platform state: Left platform enabled = " + isLeftEnabled);
         if (isLeftEnabled)
         {
             EnableLeftDisableRight();
@@ -90,7 +82,6 @@ public class PlatformToggle : UdonSharpBehaviour
 
         if (leftPlatform != null && rightPlatform != null)
         {
-            Debug.Log("[PlatformToggle] Enabling Left, Disabling Right");
             Collider leftCollider = leftPlatform.GetComponent<Collider>();
             Collider rightCollider = rightPlatform.GetComponent<Collider>();
             MeshRenderer leftRenderer = leftPlatform.GetComponent<MeshRenderer>();
@@ -112,7 +103,6 @@ public class PlatformToggle : UdonSharpBehaviour
 
         if (leftPlatform != null && rightPlatform != null)
         {
-            Debug.Log("[PlatformToggle] Enabling Right, Disabling Left");
             Collider leftCollider = leftPlatform.GetComponent<Collider>();
             Collider rightCollider = rightPlatform.GetComponent<Collider>();
             MeshRenderer leftRenderer = leftPlatform.GetComponent<MeshRenderer>();

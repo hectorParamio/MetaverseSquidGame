@@ -43,17 +43,6 @@ public class BulletCollision : UdonSharpBehaviour
                 Debug.Log("[BulletCollision] Hit cube for player: " + playerName);
                 personasManager.SetPlayerCubeState(playerName, true);
                 teleportManager.TeleportPlayer(playerName);
-
-                // Find and destroy the gun
-                GameObject endPlatformObj = GameObject.Find("EndPlatform");
-                if (endPlatformObj != null)
-                {
-                    EndPlatform endPlatform = endPlatformObj.GetComponent<EndPlatform>();
-                    if (endPlatform != null)
-                    {
-                        endPlatform.DestroyGun();
-                    }
-                }
             }
         }
     }

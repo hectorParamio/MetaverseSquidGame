@@ -31,7 +31,7 @@ public class EndPlatform : UdonSharpBehaviour
     // NEW: Variables for shot mechanics
     private int shotsFired = 0; // Track shots fired
     private const int maxShots = 3; // Maximum shots allowed
-    private readonly float[] failureProbabilities = { 10f, 40f, 60f }; // Failure chances for each shot (reverse order)
+    private readonly float[] failureProbabilities = { 0f, 00f, 0f }; // Failure chances for each shot (reverse order)
     [UdonSynced] private bool isGunActive = false;
     private VRCObjectSync gunObjectSync;
     [Header("Timer Settings")]
@@ -41,6 +41,7 @@ public class EndPlatform : UdonSharpBehaviour
     private Personas personasManager;
     public DoorController doorController;
     [UdonSynced] private bool triggerSoundHasPlayed = false;
+    private bool previousTriggerSoundState = false;
 
    void Start()
     {
@@ -100,9 +101,11 @@ public class EndPlatform : UdonSharpBehaviour
     {
         Debug.Log($"[EndPlatform] Trigger entered by player: {player.displayName}");
         
-        // Play trigger sound only once globally
-        if (!triggerSoundHasPlayed && Networking.IsOwner(gameObject))
+        // Play trigger sound only once globally, regardless of who triggers it
+        if (!triggerSoundHasPlayed)
         {
+            // Take ownership to sync the state
+            Networking.SetOwner(player, gameObject);
             triggerSoundHasPlayed = true;
             if (triggerSound != null && triggerSoundClip != null)
             {
@@ -112,14 +115,10 @@ public class EndPlatform : UdonSharpBehaviour
         }
 
         if (doorController != null && doorController.song != null && doorController.song.isPlaying)
-            {
-                doorController.song.Stop();
-                Debug.Log("[EndPlatform] Song stopped successfully.");
-            }
-        else
-            {
-                Debug.LogWarning("[EndPlatform] DoorController or song is null, or song is not playing.");
-            }
+        {
+            doorController.song.Stop();
+            Debug.Log("[EndPlatform] Song stopped successfully.");
+        }
         // Set countdown timer to 13 if it's higher
         if (countdownTimer != null)
         {
@@ -263,6 +262,7 @@ private void TryShoot()
 
                 DestroyGun();
                 Debug.Log("[EndPlatform] Shot backfired! Bullet aimed at the player.");
+
             }
             else
             {
@@ -304,9 +304,13 @@ private void TryShoot()
 
     public override void OnDeserialization()
     {
-        if (triggerSoundHasPlayed && !triggerSound.isPlaying)
+        if (triggerSoundHasPlayed && !previousTriggerSoundState)
         {
-            triggerSound.PlayOneShot(triggerSoundClip);
+            if (triggerSound != null && triggerSoundClip != null)
+            {
+                triggerSound.PlayOneShot(triggerSoundClip);
+            }
+            previousTriggerSoundState = true;
         }
         
         if (activeGun != null)
@@ -320,6 +324,12 @@ private void TryShoot()
         if (personasManager != null)
         {
             personasManager.SetPlayerCubeState(playerName, true);
+            
+            // If this is the local player who died, destroy their gun
+            if (localPlayer != null && playerName == localPlayer.displayName)
+            {
+                OnPlayerDeath();
+            }
         }
     }
 
@@ -327,12 +337,27 @@ private void TryShoot()
     {
         if (activeGun != null)
         {
+            // Take ownership before modifying networked state
+            if (!Networking.IsOwner(activeGun))
+            {
+                Networking.SetOwner(localPlayer, activeGun);
+            }
+            
             hasGun = false;
             isGunActive = false;
             isHeld = false;
             RequestSerialization();
             activeGun.SetActive(false);
-            Debug.Log("[EndPlatform] Gun deactivated");
+            Debug.Log("[EndPlatform] Gun deactivated due to player death");
+        }
+    }
+
+    // Add this new method to handle all death scenarios
+    public void OnPlayerDeath()
+    {
+        if (Networking.LocalPlayer == localPlayer && hasGun)
+        {
+            DestroyGun();
         }
     }
 
