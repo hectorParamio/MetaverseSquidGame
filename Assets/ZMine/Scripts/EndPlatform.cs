@@ -2,6 +2,7 @@
 using UnityEngine;
 using VRC.SDKBase;
 using VRC.SDK3.Components;
+using TMPro;
 
 public class EndPlatform : UdonSharpBehaviour
 {
@@ -44,6 +45,7 @@ public class EndPlatform : UdonSharpBehaviour
     private bool previousTriggerSoundState = false;
     [UdonSynced] private bool songHasPlayed = false;
     private bool previousSongState = false;
+    public TeleportManager teleportManager;
 
    void Start()
     {
@@ -274,6 +276,21 @@ private void TryShoot()
             {
                 // Aim forward
                 shootDirection = (localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).rotation * Vector3.forward).normalized;
+            }
+
+            // Identify the player from the cube's text
+            RaycastHit hit;
+            if (Physics.Raycast(spawnPos, shootDirection, out hit))
+            {
+                TextMeshProUGUI textField = hit.transform.GetComponentInChildren<TextMeshProUGUI>();
+                if (textField != null)
+                {
+                    string playerName = textField.text;
+                    if (!string.IsNullOrEmpty(playerName) && teleportManager != null)
+                    {
+                        teleportManager.TeleportPlayer(playerName);
+                    }
+                }
             }
 
             bullet.transform.rotation = Quaternion.LookRotation(shootDirection);

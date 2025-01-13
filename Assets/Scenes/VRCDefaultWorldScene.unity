@@ -4058,6 +4058,7 @@ MonoBehaviour:
   triggerSound: {fileID: 791573072}
   triggerSoundClip: {fileID: 8300000, guid: 13fac07caa56e6443b2ff5276729be67, type: 3}
   doorController: {fileID: 0}
+  teleportManager: {fileID: 0}
 --- !u!114 &791573070
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14999,6 +15000,7 @@ MonoBehaviour:
   triggerSound: {fileID: 2095258600}
   triggerSoundClip: {fileID: 8300000, guid: 13fac07caa56e6443b2ff5276729be67, type: 3}
   doorController: {fileID: 338389863}
+  teleportManager: {fileID: 0}
 --- !u!82 &2095258599
 AudioSource:
   m_ObjectHideFlags: 0
@@ -16080,19 +16082,19 @@ MonoBehaviour:
   useAssignedLayers: 0
   DynamicPrefabs: []
   DynamicMaterials:
-  - {fileID: 9203298118828928423, guid: 1884f7b1e861bac499b947fe2153afc2, type: 3}
-  - {fileID: 2100000, guid: acecf62cff1ed3a4d8aeb8a0db1937d6, type: 2}
   - {fileID: 2100000, guid: d2f6c6d261ec30d4788e33a9951a2ef5, type: 2}
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
   - {fileID: 3452949404231718817, guid: 1884f7b1e861bac499b947fe2153afc2, type: 3}
+  - {fileID: 9203298118828928423, guid: 1884f7b1e861bac499b947fe2153afc2, type: 3}
+  - {fileID: 2100000, guid: 76ff537c8e1a84345868e6aeee938ab3, type: 2}
+  - {fileID: 2100000, guid: eae9c11350249284e8400a100179e0b2, type: 2}
+  - {fileID: 2100000, guid: ea42f096d32998540835afce704c09dc, type: 2}
   - {fileID: 2100000, guid: 506771de2b6f16f4494d9cad34491466, type: 2}
+  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: acecf62cff1ed3a4d8aeb8a0db1937d6, type: 2}
   - {fileID: 2100000, guid: be3362220d9ffba49aa2965b1a68bc3d, type: 2}
   - {fileID: 2100000, guid: 0559a98ee91c2894d8e4dbaaa6d5d695, type: 2}
-  - {fileID: 2100000, guid: eae9c11350249284e8400a100179e0b2, type: 2}
-  - {fileID: 2100000, guid: 76ff537c8e1a84345868e6aeee938ab3, type: 2}
   - {fileID: 2100000, guid: fb51764eba3136e4d9facfd2a865b25f, type: 2}
   - {fileID: 2100000, guid: 8786ddb73d132334086ec1a9f1871797, type: 2}
-  - {fileID: 2100000, guid: ea42f096d32998540835afce704c09dc, type: 2}
   LightMapsNear: []
   LightMapsFar: []
   LightMode: 0
