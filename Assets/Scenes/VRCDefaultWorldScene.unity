@@ -14672,7 +14672,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2042126199
 Transform:
   m_ObjectHideFlags: 0
@@ -16080,7 +16080,6 @@ MonoBehaviour:
   useAssignedLayers: 0
   DynamicPrefabs: []
   DynamicMaterials:
-  - {fileID: 2100000, guid: 9d893c628c086a14b835e12602ee646c, type: 2}
   - {fileID: 9203298118828928423, guid: 1884f7b1e861bac499b947fe2153afc2, type: 3}
   - {fileID: 2100000, guid: acecf62cff1ed3a4d8aeb8a0db1937d6, type: 2}
   - {fileID: 2100000, guid: d2f6c6d261ec30d4788e33a9951a2ef5, type: 2}

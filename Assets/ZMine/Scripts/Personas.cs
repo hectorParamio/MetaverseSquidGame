@@ -96,9 +96,10 @@ public class Personas : UdonSharpBehaviour
 
     public void SetPlayerCubeState(string playerName, bool isDead)
     {
+        // Sincroniza la lista de jugadores muertos
         if (isDead)
         {
-            // Add player to dead players array if not already there
+            // Si el jugador no está ya en la lista de muertos, lo añade
             bool alreadyDead = false;
             for (int i = 0; i < deadPlayerCount; i++)
             {
@@ -113,19 +114,17 @@ public class Personas : UdonSharpBehaviour
             {
                 deadPlayers[deadPlayerCount] = playerName;
                 deadPlayerCount++;
-                RequestSerialization();
+                RequestSerialization(); // Sincroniza la lista de jugadores muertos
             }
         }
 
-        // Update the cube material
+        // Cambia el estado visual del cubo
         foreach (GameObject personaObj in personaObjects)
         {
             TextMeshProUGUI textField = personaObj.GetComponentInChildren<TextMeshProUGUI>();
             if (textField != null && textField.text == playerName)
             {
-                Transform personaTransform = textField.transform.parent.parent;
-                Transform cuboTransform = personaTransform.Find("Cubo");
-                
+                Transform cuboTransform = personaObj.transform.Find("Cubo");
                 if (cuboTransform != null)
                 {
                     Renderer cubeRenderer = cuboTransform.GetComponent<Renderer>();
@@ -153,10 +152,13 @@ public class Personas : UdonSharpBehaviour
 
     private bool IsPlayerDead(VRCPlayerApi player)
     {
-        // Implement your logic to determine if a player is dead
-        // For example, you could check a specific player property or state
-        // Return true if the player is dead, false otherwise
-        // This is just a placeholder method, replace it with your actual implementation
+        for (int i = 0; i < deadPlayerCount; i++)
+        {
+            if (deadPlayers[i] == player.displayName)
+            {
+                return true;
+            }
+        }
         return false;
     }
 

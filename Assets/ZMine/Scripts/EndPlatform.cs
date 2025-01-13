@@ -42,6 +42,8 @@ public class EndPlatform : UdonSharpBehaviour
     public DoorController doorController;
     [UdonSynced] private bool triggerSoundHasPlayed = false;
     private bool previousTriggerSoundState = false;
+    [UdonSynced] private bool songHasPlayed = false;
+    private bool previousSongState = false;
 
    void Start()
     {
@@ -114,10 +116,14 @@ public class EndPlatform : UdonSharpBehaviour
             RequestSerialization();
         }
 
-        if (doorController != null && doorController.song != null && doorController.song.isPlaying)
+        // Handle song stopping only once globally
+        if (!songHasPlayed && doorController != null && doorController.song != null && doorController.song.isPlaying)
         {
+            Networking.SetOwner(player, gameObject);
+            songHasPlayed = true;
             doorController.song.Stop();
             Debug.Log("[EndPlatform] Song stopped successfully.");
+            RequestSerialization();
         }
         // Set countdown timer to 13 if it's higher
         if (countdownTimer != null)
@@ -311,6 +317,16 @@ private void TryShoot()
                 triggerSound.PlayOneShot(triggerSoundClip);
             }
             previousTriggerSoundState = true;
+        }
+        
+        // Handle song state synchronization
+        if (songHasPlayed && !previousSongState)
+        {
+            if (doorController != null && doorController.song != null && doorController.song.isPlaying)
+            {
+                doorController.song.Stop();
+            }
+            previousSongState = true;
         }
         
         if (activeGun != null)
