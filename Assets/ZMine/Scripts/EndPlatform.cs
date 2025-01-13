@@ -251,6 +251,7 @@ private void TryShoot()
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "OnPlayerDeath");
                 }
 
+                DestroyGun();
                 Debug.Log("[EndPlatform] Shot backfired! Bullet aimed at the player.");
             }
             else
@@ -309,6 +310,19 @@ private void TryShoot()
         if (personasManager != null)
         {
             personasManager.SetPlayerCubeState(playerName, true);
+        }
+    }
+
+    public void DestroyGun()
+    {
+        if (activeGun != null)
+        {
+            hasGun = false;
+            isGunActive = false;
+            isHeld = false;
+            RequestSerialization();
+            activeGun.SetActive(false);
+            Debug.Log("[EndPlatform] Gun deactivated");
         }
     }
 

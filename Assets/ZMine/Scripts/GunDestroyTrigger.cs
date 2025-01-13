@@ -1,17 +1,30 @@
 ﻿using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
-using TMPro;
 
-public class DyingFell : UdonSharpBehaviour
+public class GunDestroyTrigger : UdonSharpBehaviour
 {
-    public Transform respawnPoint;
-    [SerializeField] private Material deadMaterial;
+    private EndPlatform endPlatform;
     private Personas personasManager;
 
     void Start()
     {
-        // Find the Personas manager
+        // Find the EndPlatform object
+        GameObject endPlatformObj = GameObject.Find("EndPlatform");
+        if (endPlatformObj != null)
+        {
+            endPlatform = endPlatformObj.GetComponent<EndPlatform>();
+            if (endPlatform == null)
+            {
+                Debug.LogError("[GunDestroyTrigger] EndPlatform component not found!");
+            }
+        }
+        else
+        {
+            Debug.LogError("[GunDestroyTrigger] EndPlatform object not found in scene!");
+        }
+
+        // Find Personas manager (following DyingFell's pattern)
         GameObject personasObj = GameObject.Find("Personas");
         if (personasObj != null)
         {
@@ -21,17 +34,13 @@ public class DyingFell : UdonSharpBehaviour
 
     public override void OnPlayerTriggerEnter(VRCPlayerApi player)
     {
-        Debug.Log($"[DyingFell] Player {player.displayName} fell, attempting to change cube state");
+        Debug.Log($"[GunDestroyTrigger] Player {player.displayName} entered trigger");
 
+        // Update player state (following DyingFell's pattern)
         if (personasManager != null)
         {
             personasManager.SetPlayerCubeState(player.displayName, true);
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "OnPlayerDeath");
-        }
-
-        if (respawnPoint != null)
-        {
-            player.TeleportTo(respawnPoint.position, respawnPoint.rotation);
         }
 
         // Send network event to destroy gun
@@ -49,16 +58,10 @@ public class DyingFell : UdonSharpBehaviour
 
     public void DestroyGunGlobally()
     {
-        // Find and destroy the gun
-        GameObject endPlatformObj = GameObject.Find("EndPlatform");
-        if (endPlatformObj != null)
+        if (endPlatform != null)
         {
-            EndPlatform endPlatform = endPlatformObj.GetComponent<EndPlatform>();
-            if (endPlatform != null)
-            {
-                endPlatform.DestroyGun();
-                Debug.Log("[DyingFell] Gun destroyed globally");
-            }
+            endPlatform.DestroyGun();
+            Debug.Log("[GunDestroyTrigger] Gun destroyed globally");
         }
     }
-} 
+}
