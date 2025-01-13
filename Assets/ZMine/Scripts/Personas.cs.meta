@@ -3,7 +3,12 @@ guid: c32649fc90084c447bbcf99099750be1
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - _udonSharpBackingUdonBehaviour: {instanceID: 0}
+  - spawnPoint: {instanceID: 0}
+  - activeMaterial: {fileID: 2100000, guid: 42a6d8ecf0eee434ca77929b8148c38f, type: 2}
+  - inactiveMaterial: {fileID: 2100000, guid: 4ee737b8feb82c546bfc6bf526582b64, type: 2}
+  - deadMaterial: {fileID: 2100000, guid: 1e9ecf7b390dd3242b803264dcae835f, type: 2}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

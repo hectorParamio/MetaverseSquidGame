@@ -7,6 +7,7 @@ using TMPro;
 public class BulletCollision : UdonSharpBehaviour
 {
     private TeleportManager teleportManager;
+    private Personas personasManager;
 
     void Start()
     {
@@ -15,13 +16,19 @@ public class BulletCollision : UdonSharpBehaviour
         {
             teleportManager = managerObj.GetComponent<TeleportManager>();
         }
+
+        GameObject personasObj = GameObject.Find("Personas");
+        if (personasObj != null)
+        {
+            personasManager = personasObj.GetComponent<Personas>();
+        }
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (teleportManager == null) 
+        if (teleportManager == null || personasManager == null) 
         {
-            Debug.LogError("[BulletCollision] TeleportManager not found!");
+            Debug.LogError("[BulletCollision] Required managers not found!");
             return;
         }
 
@@ -34,6 +41,7 @@ public class BulletCollision : UdonSharpBehaviour
             {
                 string playerName = textField.text;
                 Debug.Log("[BulletCollision] Hit cube for player: " + playerName);
+                personasManager.SetPlayerCubeState(playerName, true);
                 teleportManager.TeleportPlayer(playerName);
             }
         }

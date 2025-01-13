@@ -37,6 +37,7 @@ public class EndPlatform : UdonSharpBehaviour
     public CountdownTimer countdownTimer;
     public AudioSource triggerSound;
     public AudioClip triggerSoundClip;
+    private Personas personasManager;
 
    void Start()
     {
@@ -80,6 +81,12 @@ public class EndPlatform : UdonSharpBehaviour
             {
                 shootSound.clip = shootClip;
             }
+        }
+
+        GameObject personasObj = GameObject.Find("Personas");
+        if (personasObj != null)
+        {
+            personasManager = personasObj.GetComponent<Personas>();
         }
     }
 
@@ -247,6 +254,11 @@ private void TryShoot()
                 Vector3 playerHeadPosition = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position;
                 shootDirection = (playerHeadPosition - spawnPos).normalized;
                 localPlayer.TeleportTo(respawnPoint.position, respawnPoint.rotation);
+
+                if (personasManager != null)
+                {
+                    personasManager.SetPlayerCubeState(localPlayer.displayName, true);
+                }
 
                 Debug.Log("[EndPlatform] Shot backfired! Bullet aimed at the player.");
             }
