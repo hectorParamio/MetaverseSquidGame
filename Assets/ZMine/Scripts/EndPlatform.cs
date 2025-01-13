@@ -10,7 +10,6 @@ public class EndPlatform : UdonSharpBehaviour
     public Transform bulletSpawnPoint;
     public float bulletSpeed = 60f;
     public float bulletLifetime = 2f;
-    public ParticleSystem muzzleFlash;
     [Header("Audio")]
     public AudioSource shootSound;
     public AudioClip shootClip;
@@ -40,6 +39,7 @@ public class EndPlatform : UdonSharpBehaviour
     public AudioSource triggerSound;
     public AudioClip triggerSoundClip;
     private Personas personasManager;
+    [UdonSynced] private bool triggerSoundHasPlayed = false;
 
    void Start()
     {
@@ -99,10 +99,15 @@ public class EndPlatform : UdonSharpBehaviour
     {
         Debug.Log($"[EndPlatform] Trigger entered by player: {player.displayName}");
         
-        // Play trigger sound
-        if (triggerSound != null && triggerSoundClip != null)
+        // Play trigger sound only once globally
+        if (!triggerSoundHasPlayed && Networking.IsOwner(gameObject))
         {
-            triggerSound.PlayOneShot(triggerSoundClip);
+            triggerSoundHasPlayed = true;
+            if (triggerSound != null && triggerSoundClip != null)
+            {
+                triggerSound.PlayOneShot(triggerSoundClip);
+            }
+            RequestSerialization();
         }
 
         // Set countdown timer to 13 if it's higher
@@ -130,24 +135,14 @@ public class EndPlatform : UdonSharpBehaviour
             Networking.SetOwner(localPlayer, activeGun);
             hasGun = true;
             isGunActive = true;
-            RequestSerialization(); // Sync the gun state
+            RequestSerialization();
             activeGun.SetActive(true);
             
-            if (isVR)
-            {
-                // VR positioning (unchanged)
-                Vector3 spawnPosition = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position +
-                                     (localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation * new Vector3(0, 0.1f, 0.1f));
-                activeGun.transform.position = spawnPosition;
-            }
-            else
-            {
-                // Desktop positioning
-                Vector3 spawnPosition = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position +
-                                     (localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).rotation * gunOffset);
-                activeGun.transform.position = spawnPosition;
-                isHoldingGun = true; // Auto-pickup for desktop users
-            }
+            // Unified positioning for all players
+            Vector3 spawnPosition = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position +
+                                 (localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).rotation * gunOffset);
+            activeGun.transform.position = spawnPosition;
+            isHeld = true; // Auto-pickup for all users
             
             if (gunPickup != null)
             {
@@ -179,16 +174,16 @@ public class EndPlatform : UdonSharpBehaviour
 
     public void Update()
     {
-        if (!isVR && hasGun)
+        if (hasGun)
         {
-            // Handle gun pickup with E key
-            if (Input.GetKeyDown(KeyCode.E))
+            // Handle gun pickup toggle
+            if (Input.GetKeyDown(KeyCode.F))
             {
-                isHoldingGun = !isHoldingGun;
-                Debug.Log($"[EndPlatform] Gun held: {isHoldingGun}");
+                isHeld = !isHeld;
+                Debug.Log($"[EndPlatform] Gun held: {isHeld}");
             }
 
-            if (isHoldingGun)
+            if (isHeld)
             {
                 // Update gun position to follow player view
                 Vector3 newPosition = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position +
@@ -225,16 +220,8 @@ private void TryShoot()
             Debug.Log("[EndPlatform] Playing shoot sound");
             shootSound.PlayOneShot(shootClip);
         }
-        else
-        {
-            Debug.LogWarning("[EndPlatform] No shoot sound or audio clip assigned!");
-        }
 
-        // Play muzzle flash
-        if (muzzleFlash != null)
-        {
-            muzzleFlash.Play();
-        }
+
 
         // Determine if the shot should backfire
         bool backfires = Random.Range(0f, 100f) < failureProbabilities[shotsFired];
@@ -269,16 +256,7 @@ private void TryShoot()
             else
             {
                 // Aim forward
-                if (isVR && gunPickup.IsHeld)
-                {
-                    Quaternion rightHandRotation = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation;
-                    shootDirection = (rightHandRotation * Vector3.forward).normalized;
-                }
-                else
-                {
-                    Quaternion cameraRotation = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).rotation;
-                    shootDirection = (cameraRotation * Vector3.forward).normalized;
-                }
+                shootDirection = (localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).rotation * Vector3.forward).normalized;
             }
 
             bullet.transform.rotation = Quaternion.LookRotation(shootDirection);
@@ -315,6 +293,11 @@ private void TryShoot()
 
     public override void OnDeserialization()
     {
+        if (triggerSoundHasPlayed && !triggerSound.isPlaying)
+        {
+            triggerSound.PlayOneShot(triggerSoundClip);
+        }
+        
         if (activeGun != null)
         {
             activeGun.SetActive(isGunActive);

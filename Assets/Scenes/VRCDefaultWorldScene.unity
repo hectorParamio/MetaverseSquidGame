@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.31095207, g: 0.3321825, b: 0.39446488, a: 1}
+  m_IndirectSpecularColor: {r: 0.31095192, g: 0.33218214, b: 0.39446414, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -3888,7 +3888,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 42.3761, y: -13.339649, z: -0.25043058}
-  m_LocalScale: {x: 10, y: 0.5, z: 20}
+  m_LocalScale: {x: 10.204, y: 0.5, z: 20}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2095258595}
@@ -3949,7 +3949,6 @@ MonoBehaviour:
   bulletSpawnPoint: {fileID: 0}
   bulletSpeed: 30
   bulletLifetime: 3
-  muzzleFlash: {fileID: 0}
   shootSound: {fileID: 791573071}
   shootClip: {fileID: 8300000, guid: 55058f900a92bcb4d9e64c1af8ccc9df, type: 3}
   nobulletSound: {fileID: 0}
@@ -5446,7 +5445,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1949399587}
-  - {fileID: 1482638529}
   - {fileID: 1592360094}
   m_Father: {fileID: 1009296455}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -5816,7 +5814,6 @@ MonoBehaviour:
   bulletSpawnPoint: {fileID: 0}
   bulletSpeed: 30
   bulletLifetime: 3
-  muzzleFlash: {fileID: 0}
   shootSound: {fileID: 0}
   shootClip: {fileID: 0}
   nobulletSound: {fileID: 0}
@@ -6471,6 +6468,7 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 1035196501}
   timerDisplay: {fileID: 1035196499}
   startTime: 180
+  areaLight: {fileID: 1482638530}
 --- !u!1 &1040028141
 GameObject:
   m_ObjectHideFlags: 0
@@ -6489,7 +6487,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1040028142
 Transform:
   m_ObjectHideFlags: 0
@@ -8051,6 +8049,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: LED_Tube (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 8253280251575300542, guid: 20d1a925ab1a84b4881c253bf4a32c09,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -8523,6 +8526,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: LED_Tube
       objectReference: {fileID: 0}
+    - target: {fileID: 8253280251575300542, guid: 20d1a925ab1a84b4881c253bf4a32c09,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -8863,12 +8871,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1482638528}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 42, y: -12, z: -0.2}
+  m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
+  m_LocalPosition: {x: 42, y: -12, z: -0.20000076}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 913935882}
+  m_Father: {fileID: 2130706188}
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!108 &1482638530
 Light:
@@ -12283,7 +12291,6 @@ MonoBehaviour:
   bulletSpawnPoint: {fileID: 0}
   bulletSpeed: 30
   bulletLifetime: 3
-  muzzleFlash: {fileID: 0}
   shootSound: {fileID: 0}
   shootClip: {fileID: 0}
   nobulletSound: {fileID: 0}
@@ -14811,7 +14818,6 @@ MonoBehaviour:
   bulletSpawnPoint: {fileID: 0}
   bulletSpeed: 30
   bulletLifetime: 3
-  muzzleFlash: {fileID: 0}
   shootSound: {fileID: 2095258599}
   shootClip: {fileID: 8300000, guid: 55058f900a92bcb4d9e64c1af8ccc9df, type: 3}
   nobulletSound: {fileID: 2095258601}
@@ -15753,6 +15759,7 @@ Transform:
   m_Children:
   - {fileID: 1217852905}
   - {fileID: 1743906036}
+  - {fileID: 1482638529}
   m_Father: {fileID: 1304476899}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &3231720197660963110
@@ -15903,17 +15910,18 @@ MonoBehaviour:
   DynamicPrefabs: []
   DynamicMaterials:
   - {fileID: 2100000, guid: d2f6c6d261ec30d4788e33a9951a2ef5, type: 2}
-  - {fileID: 9203298118828928423, guid: 1884f7b1e861bac499b947fe2153afc2, type: 3}
-  - {fileID: 2100000, guid: acecf62cff1ed3a4d8aeb8a0db1937d6, type: 2}
-  - {fileID: 3452949404231718817, guid: 1884f7b1e861bac499b947fe2153afc2, type: 3}
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
   - {fileID: 2100000, guid: 506771de2b6f16f4494d9cad34491466, type: 2}
+  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 3452949404231718817, guid: 1884f7b1e861bac499b947fe2153afc2, type: 3}
+  - {fileID: 9203298118828928423, guid: 1884f7b1e861bac499b947fe2153afc2, type: 3}
   - {fileID: 2100000, guid: 76ff537c8e1a84345868e6aeee938ab3, type: 2}
   - {fileID: 2100000, guid: eae9c11350249284e8400a100179e0b2, type: 2}
+  - {fileID: 2100000, guid: ea42f096d32998540835afce704c09dc, type: 2}
+  - {fileID: 2100000, guid: acecf62cff1ed3a4d8aeb8a0db1937d6, type: 2}
   - {fileID: 2100000, guid: be3362220d9ffba49aa2965b1a68bc3d, type: 2}
   - {fileID: 2100000, guid: 0559a98ee91c2894d8e4dbaaa6d5d695, type: 2}
+  - {fileID: 2100000, guid: fb51764eba3136e4d9facfd2a865b25f, type: 2}
   - {fileID: 2100000, guid: 8786ddb73d132334086ec1a9f1871797, type: 2}
-  - {fileID: 2100000, guid: ea42f096d32998540835afce704c09dc, type: 2}
   LightMapsNear: []
   LightMapsFar: []
   LightMode: 0

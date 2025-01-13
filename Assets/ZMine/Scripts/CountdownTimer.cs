@@ -13,6 +13,11 @@ public class CountdownTimer : UdonSharpBehaviour
     [UdonSynced] private float networkTime = 0f;
     public float timeRemaining { get; private set; }
 
+    [Header("Light Settings")]
+    [Tooltip("Reference to the Area Light that will change color")]
+    public Light areaLight;
+    private readonly Color timerEndColor = new Color(0.13f, 1f, 0f); // hex 21FF00 converted to RGB
+
     private void Start()
     {
         if (timerDisplay == null)
@@ -22,6 +27,11 @@ public class CountdownTimer : UdonSharpBehaviour
         }
         timeRemaining = startTime;
         UpdateTimerDisplay();
+        
+        if (areaLight == null)
+        {
+            Debug.LogError("[CountdownTimer] Area Light reference is missing!");
+        }
     }
 
     public void StartTimer()
@@ -46,6 +56,7 @@ public class CountdownTimer : UdonSharpBehaviour
                 {
                     networkTime = 0;
                     isTimerRunning = false;
+                    ChangeAreaLightColor();
                     RequestSerialization();
                 }
                 else
@@ -91,5 +102,13 @@ public class CountdownTimer : UdonSharpBehaviour
     {
         timeRemaining = networkTime;
         UpdateTimerDisplay();
+    }
+
+    private void ChangeAreaLightColor()
+    {
+        if (areaLight != null)
+        {
+            areaLight.color = timerEndColor;
+        }
     }
 }
