@@ -258,6 +258,7 @@ private void TryShoot()
                 if (personasManager != null)
                 {
                     personasManager.SetPlayerCubeState(localPlayer.displayName, true);
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "OnPlayerDeath");
                 }
 
                 Debug.Log("[EndPlatform] Shot backfired! Bullet aimed at the player.");
@@ -314,6 +315,14 @@ private void TryShoot()
         if (activeGun != null)
         {
             activeGun.SetActive(isGunActive);
+        }
+    }
+
+    public void SyncPlayerDeath(string playerName)
+    {
+        if (personasManager != null)
+        {
+            personasManager.SetPlayerCubeState(playerName, true);
         }
     }
 

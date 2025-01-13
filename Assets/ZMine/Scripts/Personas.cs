@@ -11,6 +11,8 @@ public class Personas : UdonSharpBehaviour
     [SerializeField] private Material activeMaterial;   // Material for cubes with players
     [SerializeField] private Material inactiveMaterial; // Material for empty cubes
     [SerializeField] private Material deadMaterial;     // Material for dead/malfunctioned players
+    [UdonSynced] private string[] deadPlayers = new string[16]; // Adjust size based on max players
+    private int deadPlayerCount = 0;
 
     private void Update()
     {
@@ -18,7 +20,7 @@ public class Personas : UdonSharpBehaviour
         VRCPlayerApi[] players = new VRCPlayerApi[playerCount];
         VRCPlayerApi.GetPlayers(players);
 
-        Debug.Log($"[Personas] Updating {personaObjects.Length} personas for {playerCount} players");
+        // Debug.Log($"[Personas] Updating {personaObjects.Length} personas for {playerCount} players");
 
         // Update text fields and materials for each persona object
         for (int i = 0; i < personaObjects.Length; i++)
@@ -27,7 +29,7 @@ public class Personas : UdonSharpBehaviour
             TextMeshProUGUI textField = personaObjects[i].GetComponentInChildren<TextMeshProUGUI>();
             if (textField == null)
             {
-                Debug.LogError($"[Personas] Persona {i}: Missing TextMeshProUGUI component");
+                // Debug.LogError($"[Personas] Persona {i}: Missing TextMeshProUGUI component");
                 continue;
             }
 
@@ -35,18 +37,18 @@ public class Personas : UdonSharpBehaviour
             Transform personaTransform = textField.transform.parent.parent;
             Transform cuboTransform = personaTransform.Find("Cubo");
             
-            Debug.Log($"[Personas] Persona {i}: Looking for Cubo in {personaTransform.name}");
+            // Debug.Log($"[Personas] Persona {i}: Looking for Cubo in {personaTransform.name}");
             
             if (cuboTransform == null)
             {
-                Debug.LogError($"[Personas] Persona {i}: Cannot find Cubo in {personaTransform.name}");
+                // Debug.LogError($"[Personas] Persona {i}: Cannot find Cubo in {personaTransform.name}");
                 continue;
             }
 
             Renderer cubeRenderer = cuboTransform.GetComponent<Renderer>();
             if (cubeRenderer == null)
             {
-                Debug.LogError($"[Personas] Persona {i}: Cubo missing Renderer component");
+                // Debug.LogError($"[Personas] Persona {i}: Cubo missing Renderer component");
                 continue;
             }
 
@@ -54,14 +56,24 @@ public class Personas : UdonSharpBehaviour
             {
                 VRCPlayerApi player = players[i];
                 textField.text = player.displayName;
-                cubeRenderer.material = activeMaterial;
-                Debug.Log($"[Personas] Persona {i}: Set active material for player {player.displayName}");
+                
+                // Check if the player is dead and set the appropriate material
+                if (IsPlayerDead(player))
+                {
+                    cubeRenderer.material = deadMaterial;
+                    // Debug.Log($"[Personas] Persona {i}: Set dead material for player {player.displayName}");
+                }
+                else
+                {
+                    cubeRenderer.material = activeMaterial;
+                    // Debug.Log($"[Personas] Persona {i}: Set active material for player {player.displayName}");
+                }
             }
             else
             {
                 textField.text = "";
                 cubeRenderer.material = inactiveMaterial;
-                Debug.Log($"[Personas] Persona {i}: Set inactive material (no player)");
+                // Debug.Log($"[Personas] Persona {i}: Set inactive material (no player)");
             }
         }
     }
@@ -84,7 +96,28 @@ public class Personas : UdonSharpBehaviour
 
     public void SetPlayerCubeState(string playerName, bool isDead)
     {
-        
+        if (isDead)
+        {
+            // Add player to dead players array if not already there
+            bool alreadyDead = false;
+            for (int i = 0; i < deadPlayerCount; i++)
+            {
+                if (deadPlayers[i] == playerName)
+                {
+                    alreadyDead = true;
+                    break;
+                }
+            }
+
+            if (!alreadyDead && deadPlayerCount < deadPlayers.Length)
+            {
+                deadPlayers[deadPlayerCount] = playerName;
+                deadPlayerCount++;
+                RequestSerialization();
+            }
+        }
+
+        // Update the cube material
         foreach (GameObject personaObj in personaObjects)
         {
             TextMeshProUGUI textField = personaObj.GetComponentInChildren<TextMeshProUGUI>();
@@ -99,11 +132,36 @@ public class Personas : UdonSharpBehaviour
                     if (cubeRenderer != null)
                     {
                         cubeRenderer.material = isDead ? deadMaterial : activeMaterial;
-                        Debug.Log($"[Personas] Set {playerName}'s cube to {(isDead ? "dead" : "active")} state");
                     }
                 }
                 break;
             }
         }
+    }
+
+    public override void OnDeserialization()
+    {
+        // Update all dead players' cubes
+        for (int i = 0; i < deadPlayerCount; i++)
+        {
+            if (!string.IsNullOrEmpty(deadPlayers[i]))
+            {
+                SetPlayerCubeState(deadPlayers[i], true);
+            }
+        }
+    }
+
+    private bool IsPlayerDead(VRCPlayerApi player)
+    {
+        // Implement your logic to determine if a player is dead
+        // For example, you could check a specific player property or state
+        // Return true if the player is dead, false otherwise
+        // This is just a placeholder method, replace it with your actual implementation
+        return false;
+    }
+
+    public void SyncPlayerDeath(string playerName)
+    {
+        SetPlayerCubeState(playerName, true);
     }
 }

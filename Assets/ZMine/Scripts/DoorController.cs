@@ -24,7 +24,10 @@ public class DoorController : UdonSharpBehaviour
     private Vector3 initialRightPosition;
     [Header("Audio")]
     public AudioSource sound;
-    
+
+    [UdonSynced] private bool isDoorOpened = false;
+    public CountdownTimer countdownTimer; // Reference to your countdown timer
+
     void Start()
     {
         if (doorLeft == null || doorRight == null)
@@ -42,6 +45,11 @@ public class DoorController : UdonSharpBehaviour
         initialLeftPosition = doorLeft.localPosition;
         initialRightPosition = doorRight.localPosition;
         pressEText.enabled = false;  // Hide text at start
+
+        if (countdownTimer == null)
+        {
+            Debug.LogError("[DoorController] CountdownTimer component reference is missing!");
+        }
     }
 
     public override void OnPlayerTriggerEnter(VRCPlayerApi player)
@@ -76,23 +84,15 @@ public class DoorController : UdonSharpBehaviour
 
         if (!hasBeenOpened && playerInTrigger && Input.GetKeyDown(KeyCode.E))
         {
-            if (sound != null)
-            {
-                sound.PlayOneShot(sound.clip);
-                soundTimer = sound.clip.length;  // Start the timer for second sound
-            }
-
-            Debug.Log("[DoorController] Opening door");
-            isOpening = true;
-            hasBeenOpened = true;
-            closeTimer = closeDelay;
-            if (pressEText != null)
-            {
-                pressEText.enabled = false;
-            }
+            // Take ownership and sync across network
+            Networking.SetOwner(Networking.LocalPlayer, gameObject);
+            isDoorOpened = true;
+            RequestSerialization();
+            
+            // Call the networked method that handles door opening and timer start
+            OpenDoorForAll();
         }
 
-        // Handle second sound
         if (soundTimer > 0 && !secondSoundPlayed)
         {
             soundTimer -= Time.deltaTime;
@@ -133,6 +133,44 @@ public class DoorController : UdonSharpBehaviour
             doorRight.localPosition = Vector3.Lerp(doorRight.localPosition, 
                 initialRightPosition, 
                 Time.deltaTime * speed);
+        }
+    }
+
+    public void OpenDoorForAll()
+    {
+        if (sound != null)
+        {
+            sound.PlayOneShot(sound.clip);
+            soundTimer = sound.clip.length;
+        }
+
+        Debug.Log("[DoorController] Opening door for all players");
+        isOpening = true;
+        hasBeenOpened = true;
+        closeTimer = closeDelay;
+        
+        if (pressEText != null)
+        {
+            pressEText.enabled = false;
+        }
+
+        // Start the countdown timer
+        if (countdownTimer != null)
+        {
+            Debug.Log("[DoorController] Triggering countdown timer start");
+            countdownTimer.StartTimer();
+        }
+        else
+        {
+            Debug.LogError("[DoorController] CountdownTimer reference is missing!");
+        }
+    }
+
+    public override void OnDeserialization()
+    {
+        if (isDoorOpened && !hasBeenOpened)
+        {
+            OpenDoorForAll();
         }
     }
 }

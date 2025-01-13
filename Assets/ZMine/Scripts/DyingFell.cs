@@ -6,59 +6,41 @@ using TMPro;
 public class DyingFell : UdonSharpBehaviour
 {
     public Transform respawnPoint;
-    [SerializeField] private Material deadMaterial;  // Assign this in inspector
+    [SerializeField] private Material deadMaterial;
+    private Personas personasManager;
+
+    void Start()
+    {
+        // Find the Personas manager
+        GameObject personasObj = GameObject.Find("Personas");
+        if (personasObj != null)
+        {
+            personasManager = personasObj.GetComponent<Personas>();
+        }
+    }
 
     public override void OnPlayerTriggerEnter(VRCPlayerApi player)
     {
         Debug.Log($"[DyingFell] Player {player.displayName} fell, attempting to change cube state");
-        
-        // Navigate to Personas through the hierarchy
-        Transform pantallaDeMuertos = transform.parent.Find("PantallaDeMuertos");
-        if (pantallaDeMuertos != null)
+
+        if (personasManager != null)
         {
-            Transform paredMuertos = pantallaDeMuertos.Find("ParedMuertos");
-            if (paredMuertos != null)
-            {
-                Transform personas = paredMuertos.Find("Personas");
-                if (personas != null)
-                {
-                    Debug.Log("[DyingFell] Found Personas object, searching for player's cube");
-                    
-                    // Now search through the Persona objects
-                    foreach (Transform persona in personas)
-                    {
-                        TextMeshProUGUI textField = persona.GetComponentInChildren<TextMeshProUGUI>();
-                        if (textField != null && textField.text == player.displayName)
-                        {
-                            Transform cubo = persona.Find("Cubo");
-                            if (cubo != null)
-                            {
-                                Renderer cubeRenderer = cubo.GetComponent<Renderer>();
-                                if (cubeRenderer != null)
-                                {
-                                    cubeRenderer.material = deadMaterial;
-                                    Debug.Log($"[DyingFell] Changed material for {player.displayName}'s cube");
-                                }
-                            }
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    Debug.LogError("[DyingFell] Could not find Personas object!");
-                }
-            }
-            else
-            {
-                Debug.LogError("[DyingFell] Could not find ParedMuertos object!");
-            }
-        }
-        else
-        {
-            Debug.LogError("[DyingFell] Could not find PantallaDeMuertos object!");
+            personasManager.SetPlayerCubeState(player.displayName, true);
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "OnPlayerDeath");
         }
 
-        player.TeleportTo(respawnPoint.position, respawnPoint.rotation);
+        if (respawnPoint != null)
+        {
+            player.TeleportTo(respawnPoint.position, respawnPoint.rotation);
+        }
+    }
+
+    public void OnPlayerDeath()
+    {
+        // This method will be called on all clients when a player dies
+        if (personasManager != null)
+        {
+            personasManager.SetPlayerCubeState(Networking.LocalPlayer.displayName, true);
+        }
     }
 } 
