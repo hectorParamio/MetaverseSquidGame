@@ -39,6 +39,7 @@ public class EndPlatform : UdonSharpBehaviour
     public AudioSource triggerSound;
     public AudioClip triggerSoundClip;
     private Personas personasManager;
+    public DoorController doorController;
     [UdonSynced] private bool triggerSoundHasPlayed = false;
 
    void Start()
@@ -110,6 +111,15 @@ public class EndPlatform : UdonSharpBehaviour
             RequestSerialization();
         }
 
+        if (doorController != null && doorController.song != null && doorController.song.isPlaying)
+            {
+                doorController.song.Stop();
+                Debug.Log("[EndPlatform] Song stopped successfully.");
+            }
+        else
+            {
+                Debug.LogWarning("[EndPlatform] DoorController or song is null, or song is not playing.");
+            }
         // Set countdown timer to 13 if it's higher
         if (countdownTimer != null)
         {

@@ -24,6 +24,7 @@ public class DoorController : UdonSharpBehaviour
     private Vector3 initialRightPosition;
     [Header("Audio")]
     public AudioSource sound;
+    public AudioSource song;
 
     [UdonSynced] private bool isDoorOpened = false;
     public CountdownTimer countdownTimer; // Reference to your countdown timer
@@ -84,6 +85,7 @@ public class DoorController : UdonSharpBehaviour
 
         if (!hasBeenOpened && playerInTrigger && Input.GetKeyDown(KeyCode.E))
         {
+            song.PlayOneShot(song.clip);
             // Take ownership and sync across network
             Networking.SetOwner(Networking.LocalPlayer, gameObject);
             isDoorOpened = true;
