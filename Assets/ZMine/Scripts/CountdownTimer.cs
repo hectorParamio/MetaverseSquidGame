@@ -24,6 +24,10 @@ public class CountdownTimer : UdonSharpBehaviour
     public AudioClip musicClip;
     private bool musicHasPlayed = false;
 
+    [Header("Objects to Disable")]
+    public GameObject bridge;
+    public GameObject cubeBeginningPlatform;
+
     private void Start()
     {
         if (timerDisplay == null)
@@ -62,6 +66,16 @@ public class CountdownTimer : UdonSharpBehaviour
                     isTimerRunning = false;
                     shouldChangeLightColor = true;
                     RequestSerialization();
+
+                    // Disable objects when timer reaches zero
+                    if (bridge != null)
+                    {
+                        bridge.SetActive(false);
+                    }
+                    if (cubeBeginningPlatform != null)
+                    {
+                        cubeBeginningPlatform.SetActive(false);
+                    }
                 }
                 else
                 {
@@ -76,7 +90,7 @@ public class CountdownTimer : UdonSharpBehaviour
             // Play music when timer reaches 12 seconds
             if (timeRemaining <= 12f && !musicHasPlayed)
             {
-                musicHasPlayed = true;
+                musicHasPlayed = true; // Ensure it plays only once
                 if (musicSource != null && musicClip != null)
                 {
                     musicSource.PlayOneShot(musicClip);

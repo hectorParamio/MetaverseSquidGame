@@ -32,7 +32,7 @@ public class EndPlatform : UdonSharpBehaviour
     // NEW: Variables for shot mechanics
     private int shotsFired = 0; // Track shots fired
     private const int maxShots = 3; // Maximum shots allowed
-    private readonly float[] failureProbabilities = { 0f, 00f, 0f }; // Failure chances for each shot (reverse order)
+    private readonly float[] failureProbabilities = { 10f, 40f, 60f }; // Failure chances for each shot (reverse order)
     [UdonSynced] private bool isGunActive = false;
     private VRCObjectSync gunObjectSync;
     [Header("Timer Settings")]
