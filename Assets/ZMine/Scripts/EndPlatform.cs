@@ -46,6 +46,7 @@ public class EndPlatform : UdonSharpBehaviour
     [UdonSynced] private bool songHasPlayed = false;
     private bool previousSongState = false;
     public TeleportManager teleportManager;
+    [UdonSynced] private bool musicHasPlayed = false;
 
    void Start()
     {

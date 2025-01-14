@@ -19,6 +19,11 @@ public class CountdownTimer : UdonSharpBehaviour
     public Light areaLight;
     private readonly Color timerEndColor = new Color(0.13f, 1f, 0f); // hex 21FF00 converted to RGB
 
+    [Header("Audio Settings")]
+    public AudioSource musicSource;
+    public AudioClip musicClip;
+    private bool musicHasPlayed = false;
+
     private void Start()
     {
         if (timerDisplay == null)
@@ -67,6 +72,16 @@ public class CountdownTimer : UdonSharpBehaviour
             // Update local display for all clients
             timeRemaining = networkTime;
             UpdateTimerDisplay();
+
+            // Play music when timer reaches 12 seconds
+            if (timeRemaining <= 12f && !musicHasPlayed)
+            {
+                musicHasPlayed = true;
+                if (musicSource != null && musicClip != null)
+                {
+                    musicSource.PlayOneShot(musicClip);
+                }
+            }
         }
 
         // Check for light color change
